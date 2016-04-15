@@ -259,3 +259,45 @@ SELECT r.id, m.title FROM Rooms r
 LEFT OUTER JOIN Movies m
 ON r.movie_id = m.id
 WHERE seats > (SELECT AVG(seats) FROM Rooms);
+
+
+-- Select ten rows from the flights table.
+
+SELECT * FROM Flights
+LIMIT 10;
+
+-- Find flight information about flights where the origin elevation is less than
+-- 2000 feet.
+
+SELECT * FROM Flights
+WHERE origin in (
+  SELECT code
+  FROM Airports
+  WHERE elevation < 2000);
+
+-- Find flight information about flights where the Federal Aviation
+-- Administration region (faa_region) is the Southern region (ASO).
+
+SELECT * FROM Flights
+WHERE origin in (
+  SELECT code
+  FROM Airports
+  WHERE faa_region = 'ASO');
+
+-- Using a subquery, find the average total distance flown by day of week and
+-- month. Be sure to alias the outer query as average_distance and the inner 
+-- query as flight_distance.
+
+SELECT a.dep_month,
+       a.dep_day_of_week,
+      AVG(a.flight_distance) AS average_distance
+      FROM (
+        SELECT dep_month,
+               dep_day_of_week,
+               dep_date,
+               SUM(distance) AS flight_distance
+        FROM flights
+        GROUP BY 1, 2, 3
+      ) a
+      GROUP BY 1, 2
+      ORDER BY 1, 2;
